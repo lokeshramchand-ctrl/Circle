@@ -1,6 +1,12 @@
-  
+version: "3.9"
+
+services:
+  # ===============================
+  # 🟢 Node.js Backend
+  # ===============================
   backend:
     build: .
+    container_name: backend
     restart: always
     env_file:
       - ./.env
@@ -8,9 +14,17 @@
       - "8000:8000"
     depends_on:
       - db
+    volumes:
+      - .:/app
+      - /app/node_modules
+    command: ["npm", "start"]
 
+  # ===============================
+  # 🐘 PostgreSQL Database
+  # ===============================
   db:
     image: postgres:16
+    container_name: postgres_db
     restart: always
     env_file:
       - ./.env
@@ -19,8 +33,12 @@
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
+  # ===============================
+  # 🧭 pgAdmin (optional GUI)
+  # ===============================
   pgadmin:
     image: dpage/pgadmin4
+    container_name: pgadmin
     restart: always
     env_file:
       - ./.env
@@ -28,3 +46,9 @@
       - "8080:80"
     depends_on:
       - db
+
+# ===============================
+# Persistent Volume for PostgreSQL
+# ===============================
+volumes:
+  postgres_data:
